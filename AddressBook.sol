@@ -3,8 +3,9 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract AddressBook is Ownable(msg.sender) {
+contract AddressBook is Ownable {
     string private salt = "ваша строка тут"; 
+
     struct Contact {
         uint id;
         string firstName;
@@ -17,6 +18,8 @@ contract AddressBook is Ownable(msg.sender) {
     uint private nextId = 1;
 
     error ContactNotFound(uint id);
+
+    constructor() Ownable() {}
 
     function addContact(string calldata firstName, string calldata lastName, uint[] calldata phoneNumbers) external onlyOwner {
         contacts.push(Contact(nextId, firstName, lastName, phoneNumbers));
