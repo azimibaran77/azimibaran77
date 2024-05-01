@@ -13,37 +13,31 @@ contract AddressBook is Ownable {
         uint[] phoneNumbers;
     }
 
-    Contact[] private contacts;
-    mapping(uint => uint) private idToIndex;
+    mapping(uint => Contact) private contacts;
     uint private nextId = 1;
 
     error ContactNotFound(uint id);
 
-    constructor() Ownable() {}
-
     function addContact(string calldata firstName, string calldata lastName, uint[] calldata phoneNumbers) external onlyOwner {
-        contacts.push(Contact(nextId, firstName, lastName, phoneNumbers));
-        idToIndex[nextId] = contacts.length - 1;
+        contacts[nextId] = Contact(nextId, firstName, lastName, phoneNumbers);
         nextId++;
     }
 
     function deleteContact(uint id) external onlyOwner {
-        uint index = idToIndex[id];
-        if (index >= contacts.length || contacts[index].id != id) revert ContactNotFound(id);
-
-        contacts[index] = contacts[contacts.length - 1];
-        idToIndex[contacts[index].id] = index;
-        contacts.pop();
-        delete idToIndex[id];
+        require(contacts[id].id != 0, "Contact not found");
+        delete contacts[id];
     }
 
     function getContact(uint id) external view returns (Contact memory) {
-        uint index = idToIndex[id];
-        if (index >= contacts.length || contacts[index].id != id) revert ContactNotFound(id);
-        return contacts[index];
+        if (contacts[id].id == 0) revert ContactNotFound(id);
+        return contacts[id];
     }
 
     function getAllContacts() external view returns (Contact[] memory) {
-        return contacts;
+        Contact[] memory allContacts = new Contact[](nextId - 1);
+        for (uint i = 1; i < nextId; i++) {
+            allContacts[i - 1] = contacts[i];
+        }
+        return allContacts;
     }
 }
