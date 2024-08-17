@@ -10,6 +10,7 @@ contract AddressBook is Ownable {
         uint id;
         string firstName;
         string lastName;
+string lastName2;
         uint[] phoneNumbers;
     }
 
